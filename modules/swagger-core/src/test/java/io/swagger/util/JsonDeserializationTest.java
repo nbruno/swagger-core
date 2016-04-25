@@ -2,6 +2,7 @@ package io.swagger.util;
 
 import io.swagger.TestUtils;
 import io.swagger.models.*;
+import io.swagger.models.properties.Property;
 import org.testng.annotations.Test;
 
 import java.util.List;
@@ -90,7 +91,8 @@ public class JsonDeserializationTest {
 
         Swagger swagger = TestUtils.deserializeJsonFileFromClasspath("specFiles/propertyWithVendorExtensions.json", Swagger.class);
 
-        Map<String, Object> vendorExtensions = swagger.getDefinitions().get("Health").getProperties().get("status").getVendorExtensions();
+        Map<String, Property> properties = swagger.getDefinitions().get("Health").getProperties();
+        Map<String, Object> vendorExtensions = properties.get("status").getVendorExtensions();
 
         assertNotNull(vendorExtensions);
         assertEquals(6, vendorExtensions.size());
@@ -123,7 +125,14 @@ public class JsonDeserializationTest {
         assertFalse(vendorExtensions.containsKey("not-an-extension"));
 
         //check for vendor extensions in array property types
-        vendorExtensions = swagger.getDefinitions().get("Health").getProperties().get("array").getVendorExtensions();
+        vendorExtensions = properties.get("array").getVendorExtensions();
+
+        xStringValue = (String) vendorExtensions.get("x-string-value");
+        assertNotNull(xStringValue);
+        assertEquals(xStringValue, "string_value");
+
+        //check for vendor extensions in ref property types
+        vendorExtensions = properties.get("ref").getVendorExtensions();
 
         xStringValue = (String) vendorExtensions.get("x-string-value");
         assertNotNull(xStringValue);
